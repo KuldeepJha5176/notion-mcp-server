@@ -1,0 +1,78 @@
+[project]
+name = "notion-mcp-server"
+version = "0.1.0"
+description = "Powerful MCP server for Notion - read, create, search, and manage pages and databases through Claude"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Kuldeep Jha", email = "ranacjha@gmail.com" }
+]
+maintainers = [
+    { name = "Kuldeep Jha", email = "ranacjha@gmail.com" }
+]
+keywords = [
+    "mcp",
+    "notion",
+    "claude",
+    "anthropic",
+    "ai",
+    "model-context-protocol",
+    "notion-api",
+    "automation",
+    "productivity"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Office/Business",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "fastmcp>=3.3.1",
+    "httpx>=0.28.1",
+    "notion-client>=3.1.0",
+    "python-dotenv>=1.2.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "ruff>=0.1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/KuldeepJha5176/notion-mcp-server"
+Documentation = "https://github.com/KuldeepJha5176/notion-mcp-server#readme"
+Repository = "https://github.com/KuldeepJha5176/notion-mcp-server"
+"Bug Tracker" = "https://github.com/KuldeepJha5176/notion-mcp-server/issues"
+Changelog = "https://github.com/KuldeepJha5176/notion-mcp-server/releases"
+
+[project.scripts]
+notion-mcp = "notion_mcp.server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/notion_mcp"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/",
+    "README.md",
+    "LICENSE",
+    ".env.example",
+    "pyproject.toml",
+]
