@@ -2,7 +2,7 @@
 
 from datetime import datetime, date
 from typing import Optional, List, Dict, Any
-from ..client import notion
+from ..client import get_notion_client
 from ..helpers.url_parser import extract_id, get_page_title
 from ..helpers.markdown_to_blocks import markdown_to_blocks
 from ..helpers.property_builder import build_properties, parse_property_value
@@ -11,6 +11,7 @@ from ..config import DEFAULT_PARENT_PAGE_ID
 
 async def _find_database_by_name(name_keywords: List[str]) -> Optional[dict]:
     """Find a database whose title contains any keyword (case-insensitive)."""
+    notion = get_notion_client()
     response = await notion.search(
         filter={"property": "object", "value": "database"},
         page_size=100,
@@ -27,6 +28,7 @@ async def _find_database_by_name(name_keywords: List[str]) -> Optional[dict]:
 
 async def quick_note(content: str, title: Optional[str] = None) -> dict:
     """Create a quick note under DEFAULT_PARENT_PAGE_ID with timestamp."""
+    notion = get_notion_client()
     if not DEFAULT_PARENT_PAGE_ID:
         raise ValueError(
             "DEFAULT_PARENT_PAGE_ID not set in .env. "
@@ -60,6 +62,7 @@ async def quick_note(content: str, title: Optional[str] = None) -> dict:
 
 async def daily_journal(entry: str, journal_keyword: str = "journal") -> dict:
     """Append a timestamped entry to today's journal page."""
+    notion = get_notion_client()
     response = await notion.search(
         query=journal_keyword,
         filter={"property": "object", "value": "page"},
@@ -106,6 +109,7 @@ async def add_task(
     tags: Optional[List[str]] = None,
 ) -> dict:
     """Quick-add a task to your Tasks database (auto-detected)."""
+    notion = get_notion_client()
     db = await _find_database_by_name(["task", "todo", "to-do"])
     if not db:
         raise ValueError("No tasks database found. Create one with 'Task' in name.")
@@ -157,6 +161,7 @@ async def add_task(
 
 async def get_today_tasks() -> dict:
     """Get all tasks due today or earlier (overdue)."""
+    notion = get_notion_client()
     db = await _find_database_by_name(["task", "todo", "to-do"])
     if not db:
         raise ValueError("No tasks database found.")
@@ -207,6 +212,7 @@ async def get_today_tasks() -> dict:
 
 async def complete_task(task_name_or_id: str) -> dict:
     """Mark a task as complete by name or ID."""
+    notion = get_notion_client()
     page = None
 
     try:
@@ -268,6 +274,7 @@ async def complete_task(task_name_or_id: str) -> dict:
 
 async def get_recent_pages(limit: int = 10) -> dict:
     """Get recently edited pages."""
+    notion = get_notion_client()
     response = await notion.search(
         filter={"property": "object", "value": "page"},
         sort={"direction": "descending", "timestamp": "last_edited_time"},
@@ -292,6 +299,7 @@ async def get_recent_pages(limit: int = 10) -> dict:
 
 async def learning_dashboard() -> dict:
     """Get a dashboard view of your AI/ML learning progress."""
+    notion = get_notion_client()
     db = await _find_database_by_name(["topic", "learning", "ai/ml", "ai", "ml"])
     if not db:
         raise ValueError(

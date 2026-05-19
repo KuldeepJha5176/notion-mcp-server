@@ -1,6 +1,11 @@
 """Notion API client wrapper."""
 
+from functools import lru_cache
 from notion_client import AsyncClient
-from .config import NOTION_TOKEN
+from .config import get_notion_token
 
-notion = AsyncClient(auth=NOTION_TOKEN)
+
+@lru_cache(maxsize=1)
+def get_notion_client() -> AsyncClient:
+    return AsyncClient(auth=get_notion_token())
+    

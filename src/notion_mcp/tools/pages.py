@@ -1,7 +1,7 @@
 """Page CRUD operations for Notion."""
 
 from typing import Optional
-from ..client import notion
+from ..client import get_notion_client
 from ..helpers.url_parser import extract_id, get_page_title
 from ..helpers.markdown_to_blocks import markdown_to_blocks
 from ..helpers.blocks_to_markdown import blocks_to_markdown
@@ -14,6 +14,7 @@ from ..config import DEFAULT_PRIVACY
 
 async def fetch_all_blocks(block_id: str) -> list[dict]:
     """Fetch all child blocks of a page/block, handling pagination."""
+    notion = get_notion_client()
     all_blocks = []
     cursor = None
 
@@ -38,6 +39,7 @@ async def fetch_all_blocks(block_id: str) -> list[dict]:
 
 async def get_page(page_id_or_url: str) -> dict:
     """Fetch a Notion page including its full content as markdown."""
+    notion = get_notion_client()
     page_id = extract_id(page_id_or_url)
 
     # Get page metadata
@@ -120,6 +122,7 @@ async def create_page(
                    If None, uses DEFAULT_PARENT_PAGE_ID from .env
         privacy: 'private' or 'public' (default from config)
     """
+    notion = get_notion_client()
     from ..config import DEFAULT_PARENT_PAGE_ID
 
     privacy = (privacy or DEFAULT_PRIVACY).lower()
@@ -242,6 +245,7 @@ async def create_page(
 
 async def append_to_page(page_id_or_url: str, content: str) -> dict:
     """Append markdown content as new blocks to an existing page."""
+    notion = get_notion_client()
     page_id = extract_id(page_id_or_url)
     blocks = markdown_to_blocks(content)
 
@@ -267,6 +271,7 @@ async def append_to_page(page_id_or_url: str, content: str) -> dict:
 
 async def update_page_title(page_id_or_url: str, new_title: str) -> dict:
     """Rename a Notion page."""
+    notion = get_notion_client()
     page_id = extract_id(page_id_or_url)
 
     # Get the page to find the title property
@@ -300,6 +305,7 @@ async def update_page_title(page_id_or_url: str, new_title: str) -> dict:
 
 async def archive_page(page_id_or_url: str) -> dict:
     """Archive (soft-delete) a Notion page. Recoverable from Trash."""
+    notion = get_notion_client()
     page_id = extract_id(page_id_or_url)
 
     await notion.pages.update(page_id=page_id, archived=True)
@@ -317,6 +323,7 @@ async def archive_page(page_id_or_url: str) -> dict:
 
 async def restore_page(page_id_or_url: str) -> dict:
     """Restore an archived page."""
+    notion = get_notion_client()
     page_id = extract_id(page_id_or_url)
 
     await notion.pages.update(page_id=page_id, archived=False)

@@ -60,7 +60,8 @@ async def search_notion(
 @mcp.tool()
 async def check_connection() -> dict:
     """Verify Notion integration is working."""
-    from .client import notion
+    from .client import get_notion_client
+    notion = get_notion_client()
     response = await notion.search(page_size=1)
     return {
         "status": "✅ Connected" if response else "❌ Failed",

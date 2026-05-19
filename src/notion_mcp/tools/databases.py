@@ -1,7 +1,7 @@
 """Database CRUD operations for Notion."""
 
 from typing import Optional, List, Dict, Any
-from ..client import notion
+from ..client import get_notion_client
 from ..helpers.url_parser import extract_id, get_page_title
 from ..helpers.property_builder import (
     build_properties,
@@ -17,6 +17,7 @@ async def _get_schema(db_id: str) -> dict:
     if cached:
         return cached
 
+    notion = get_notion_client()
     db = await notion.databases.retrieve(database_id=db_id)
     schema = {
         name: {"type": data.get("type"), "raw": data}
@@ -28,6 +29,7 @@ async def _get_schema(db_id: str) -> dict:
 
 async def list_databases() -> dict:
     """List all databases accessible to the integration."""
+    notion = get_notion_client()
     response = await notion.search(
         filter={"property": "object", "value": "database"},
         page_size=100,
@@ -52,6 +54,7 @@ async def list_databases() -> dict:
 
 async def get_database_schema(database_id_or_url: str) -> dict:
     """Get the full schema (columns/properties) of a database."""
+    notion = get_notion_client()
     db_id = extract_id(database_id_or_url)
     db = await notion.databases.retrieve(database_id=db_id)
 
@@ -94,6 +97,7 @@ async def query_database(
     limit: int = 50,
 ) -> dict:
     """Query a database with filters and sorting."""
+    notion = get_notion_client()
     db_id = extract_id(database_id_or_url)
     schema = await _get_schema(db_id)
 
@@ -142,6 +146,7 @@ async def add_database_row(
     content: str = "",
 ) -> dict:
     """Add a new row to a database."""
+    notion = get_notion_client()
     db_id = extract_id(database_id_or_url)
     schema = await _get_schema(db_id)
 
@@ -175,6 +180,7 @@ async def update_database_row(
     properties: Dict[str, Any],
 ) -> dict:
     """Update properties of an existing database row."""
+    notion = get_notion_client()
     page_id = extract_id(page_id_or_url)
 
     page = await notion.pages.retrieve(page_id=page_id)
@@ -201,6 +207,7 @@ async def bulk_add_rows(
     rows: List[Dict[str, Any]],
 ) -> dict:
     """Add multiple rows to a database at once."""
+    notion = get_notion_client()
     db_id = extract_id(database_id_or_url)
     schema = await _get_schema(db_id)
 

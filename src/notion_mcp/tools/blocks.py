@@ -1,6 +1,6 @@
 """Block-level operations for Notion."""
 
-from ..client import notion
+from ..client import get_notion_client
 from ..helpers.url_parser import extract_id
 from ..helpers.blocks_to_markdown import blocks_to_markdown
 from ..helpers.markdown_to_blocks import markdown_to_blocks
@@ -8,6 +8,7 @@ from ..helpers.markdown_to_blocks import markdown_to_blocks
 
 async def get_block_children(block_id_or_url: str) -> dict:
     """Get all children blocks of a block (page or container)."""
+    notion = get_notion_client()
     block_id = extract_id(block_id_or_url)
 
     all_blocks = []
@@ -42,6 +43,7 @@ async def get_block_children(block_id_or_url: str) -> dict:
 
 async def update_block(block_id_or_url: str, new_content: str) -> dict:
     """Update a single block's text content."""
+    notion = get_notion_client()
     block_id = extract_id(block_id_or_url)
 
     block = await notion.blocks.retrieve(block_id=block_id)
@@ -78,6 +80,7 @@ async def update_block(block_id_or_url: str, new_content: str) -> dict:
 
 async def delete_block(block_id_or_url: str) -> dict:
     """Delete a single block."""
+    notion = get_notion_client()
     block_id = extract_id(block_id_or_url)
     await notion.blocks.delete(block_id=block_id)
     return {
@@ -89,6 +92,7 @@ async def delete_block(block_id_or_url: str) -> dict:
 
 async def duplicate_page(page_id_or_url: str, new_title: str = None) -> dict:
     """Duplicate a page (creates a copy with same content)."""
+    notion = get_notion_client()
     page_id = extract_id(page_id_or_url)
 
     # Get original page
@@ -129,7 +133,6 @@ async def duplicate_page(page_id_or_url: str, new_title: str = None) -> dict:
     # Determine parent type for new page
     if parent.get("type") == "database_id":
         new_parent = {"database_id": parent["database_id"]}
-        # Reuse properties (simplified)
         properties = {}
         from ..helpers.property_builder import build_properties
         db = await notion.databases.retrieve(database_id=parent["database_id"])

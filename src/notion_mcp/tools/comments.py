@@ -1,11 +1,12 @@
 """Comments operations for Notion pages."""
 
-from ..client import notion
+from ..client import get_notion_client
 from ..helpers.url_parser import extract_id
 
 
 async def add_comment(page_id_or_url: str, comment_text: str) -> dict:
     """Add a comment to a Notion page."""
+    notion = get_notion_client()
     page_id = extract_id(page_id_or_url)
 
     response = await notion.comments.create(
@@ -23,6 +24,7 @@ async def add_comment(page_id_or_url: str, comment_text: str) -> dict:
 
 async def get_comments(page_id_or_url: str) -> dict:
     """Get all comments on a page."""
+    notion = get_notion_client()
     page_id = extract_id(page_id_or_url)
 
     response = await notion.comments.list(block_id=page_id)

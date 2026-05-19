@@ -1,6 +1,6 @@
 """Search tools for Notion."""
 
-from ..client import notion
+from ..client import get_notion_client
 from ..helpers.url_parser import get_page_title
 
 
@@ -12,6 +12,7 @@ async def search_notion(
     """
     Search across all Notion pages and databases shared with the integration.
     """
+    notion = get_notion_client()
     search_params = {
         "query": query,
         "page_size": min(limit, 100),
