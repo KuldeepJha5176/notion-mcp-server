@@ -42,17 +42,19 @@ Ask Claude things like:
 
 ### Install with uv (recommended)
 
-\`\`\`bash
+```bash
 uv tool install notion-mcp-server
-\`\`\`
+```
 
 ### Install with pip
 
-\`\`\`bash
+```bash
 pip install notion-mcp-server
-\`\`\`
+```
 
 ## 🔧 Setup (5 minutes)
+
+> **Each user needs their own Notion integration token.** Tokens are personal — they grant access only to the pages you explicitly share with your integration. No `.env` file is needed when using `uvx`; your token goes directly in the Claude config JSON (Step 3).
 
 ### Step 1: Create a Notion Integration
 
@@ -77,18 +79,19 @@ For each page or database you want Claude to access:
 ### Step 3: Configure Claude Desktop
 
 **Mac/Linux:**
-\`\`\`bash
+```bash
 ~/Library/Application\ Support/Claude/claude_desktop_config.json
-\`\`\`
+```
 
 **Windows:**
-\`\`\`
-%APPDATA%\\Claude\\claude_desktop_config.json
-\`\`\`
+```
+%APPDATA%\Claude\claude_desktop_config.json
+```
+
 
 Add this configuration:
 
-\`\`\`json
+```json
 {
   "mcpServers": {
     "notion": {
@@ -102,7 +105,37 @@ Add this configuration:
     }
   }
 }
-\`\`\`
+```
+
+---
+
+### 🗂 Alternative: Project-level Setup via `.mcp.json`
+
+Instead of editing the global Claude Desktop config, you can enable the Notion MCP server **per-project** by adding a `.mcp.json` file to the root of any codebase. This is ideal for team projects or when you want the server scoped to a specific workspace.
+
+Create `.mcp.json` in your project root:
+
+```json
+{
+  "mcpServers": {
+    "notion": {
+      "command": "uvx",
+      "args": ["notion-mcp-server"],
+      "env": {
+        "NOTION_TOKEN": "secret_your_token_here",
+        "DEFAULT_PRIVACY": "private",
+        "DEFAULT_PARENT_PAGE_ID": "optional_parent_page_id"
+      }
+    }
+  }
+}
+```
+
+> 💡 **Tip:** Add `.mcp.json` to your `.gitignore` if it contains your `NOTION_TOKEN`, or use environment variable references and keep secrets in a local `.env` file.
+
+Supported by **Claude Code**, **Cursor**, **Windsurf**, and other MCP-compatible editors that respect project-level config files.
+
+---
 
 ### Step 4: Restart Claude Desktop
 
@@ -181,9 +214,9 @@ Full bidirectional conversion:
 
 | Environment Variable | Required | Description |
 |---------------------|----------|-------------|
-| \`NOTION_TOKEN\` | ✅ Yes | Your integration secret |
-| \`DEFAULT_PRIVACY\` | ❌ No | \`private\` (default) or \`public\` |
-| \`DEFAULT_PARENT_PAGE_ID\` | ❌ No | Default parent for new pages |
+| `NOTION_TOKEN` | ✅ Yes | Your integration secret |
+| `DEFAULT_PRIVACY` | ❌ No | `private` (default) or `public` |
+| `DEFAULT_PARENT_PAGE_ID` | ❌ No | Default parent for new pages |
 
 ## 💡 Examples
 
@@ -191,11 +224,11 @@ Full bidirectional conversion:
 
 > *"Add 20 AI/ML topics to my Topics database with appropriate categories and priorities"*
 
-Claude uses \`bulk_add_rows\` to create all 20 entries with one command.
+Claude uses `bulk_add_rows` to create all 20 entries with one command.
 
 ### Example 2: Daily Workflow
 
-\`\`\`
+```
 You: "What tasks do I have today?"
 Claude: [shows your today_tasks]
 
@@ -204,7 +237,7 @@ Claude: [calls complete_task]
 
 You: "Add a journal entry: Productive day, finished 5 tasks"
 Claude: [appends to journal page]
-\`\`\`
+```
 
 ### Example 3: Smart Querying
 
@@ -224,22 +257,44 @@ You haven't shared any pages with the integration yet.
 
 ### "Cannot create workspace-level page"
 Internal integrations can't create pages at workspace root.
-**Fix:** Set \`DEFAULT_PARENT_PAGE_ID\` in your config to a parent page.
+**Fix:** Set `DEFAULT_PARENT_PAGE_ID` in your config to a parent page.
 
 ### Rate limit errors
 Notion API allows ~3 requests/second.
 **Fix:** Server has built-in auto-retry with exponential backoff.
 
+## 🧑‍💻 Local Development Setup
+
+If you're contributing or want to run from source, use a `.env` file instead of the config JSON:
+
+```bash
+git clone https://github.com/KuldeepJha5176/notion-mcp-server
+cd notion-mcp-server
+cp .env.example .env
+# Edit .env and add your NOTION_TOKEN
+uv sync
+uv run notion-mcp
+```
+
+Your `.env` file:
+```env
+NOTION_TOKEN=secret_your_token_here
+DEFAULT_PRIVACY=private
+DEFAULT_PARENT_PAGE_ID=   # optional
+```
+
+> The `.env` file is only for local development. Regular users should use the `env` block in the Claude config JSON as shown in Step 3.
+
 ## 🤝 Contributing
 
 Pull requests welcome! For major changes, please open an issue first.
 
-\`\`\`bash
+```bash
 git clone https://github.com/KuldeepJha5176/notion-mcp-server
 cd notion-mcp-server
 uv sync
 uv run pytest
-\`\`\`
+```
 
 ## 🔒 Security
 

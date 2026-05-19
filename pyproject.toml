@@ -1,6 +1,6 @@
 [project]
 name = "notion-mcp-server"
-version = "0.1.0"
+version = "0.1.1"
 description = "Powerful MCP server for Notion - read, create, search, and manage pages and databases through Claude"
 readme = "README.md"
 requires-python = ">=3.10"
